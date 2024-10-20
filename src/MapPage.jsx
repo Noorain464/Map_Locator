@@ -5,7 +5,6 @@ import customIcon from './Icon';
 import 'leaflet/dist/leaflet.css'
 import '../src/index.css'
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 function MapPage() {
   const [positions, setPositions] = useState(() => {
     const storedPositions = localStorage.getItem('positions');
@@ -79,7 +78,8 @@ function MapPage() {
         <h2 style={{textAlign: 'center',fontFamily: 'sans-serif'}}>Saved Pins</h2>
         {positions.map((position, index) => (
           <div key={index} style={{border: '1px solid black', padding: '10px', margin: '10px'}}>
-            <p>{`Latitude: ${positions[index].lat}, Longitude: ${positions[index].lng}`}</p>
+            <p>{`Latitude: ${positions[index].lat}`}</p>
+            <p>{`Longitude: ${positions[index].lng}`}</p>
             <p>{`Message: ${messages[index]}`}</p>
           </div>
         ))}
