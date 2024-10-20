@@ -31,11 +31,7 @@ function MapPage() {
     });
     return null;
   }
-  // This part is checking if there is a new position and message
-  // available in the state. If there is, it will add the new
-  // position and message to the existing state and reset the
-  // new position and message to null and an empty string
-  // respectively.
+  
   if (newPosition) {
     setPositions([...positions, newPosition]);
     setMessages([...messages, newMessage]);
