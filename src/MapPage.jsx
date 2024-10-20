@@ -4,13 +4,21 @@ import { Popup } from 'react-leaflet'
 import customIcon from './Icon';
 import 'leaflet/dist/leaflet.css'
 import '../src/index.css'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function MapPage() {
-  const [positions, setPositions] = useState([]);
-  const [messages, setMessages] = useState([]);
+  const [positions, setPositions] = useState(
+    JSON.parse(localStorage.getItem('positions')) || []
+  );
+  const [messages, setMessages] = useState(
+    JSON.parse(localStorage.getItem('messages')) || []
+  );
   const [newPosition, setNewPosition] = useState(null);
   const [newMessage, setNewMessage] = useState('');
+  useEffect(() => {
+    localStorage.setItem('positions', JSON.stringify(positions));
+    localStorage.setItem('messages', JSON.stringify(messages));
+  }, [positions, messages]);
   function MapEvents() {
     useMapEvents({
       click(e) {
