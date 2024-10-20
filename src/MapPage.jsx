@@ -4,21 +4,32 @@ import { Popup } from 'react-leaflet'
 import customIcon from './Icon';
 import 'leaflet/dist/leaflet.css'
 import '../src/index.css'
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 function MapPage() {
-  const [positions, setPositions] = useState(
-    JSON.parse(localStorage.getItem('positions')) || []
-  );
-  const [messages, setMessages] = useState(
-    JSON.parse(localStorage.getItem('messages')) || []
-  );
+  const [positions, setPositions] = useState(() => {
+    const storedPositions = localStorage.getItem('positions');
+    try {
+      const parsedPositions = JSON.parse(storedPositions);
+      return Array.isArray(parsedPositions)
+        ? parsedPositions.filter(pos => pos && pos.lat !== undefined && pos.lng !== undefined)
+        : [];
+    } catch (error) {
+      console.error('Error parsing positions from localStorage:', error);
+      return [];
+    }
+  });
+  const [messages, setMessages] = useState(() => {
+    const storedMessages = localStorage.getItem('messages');
+    try {
+      return JSON.parse(storedMessages) || [];
+    } catch (error) {
+      console.error('Error parsing messages from localStorage:', error);
+      return [];
+    }
+  });
   const [newPosition, setNewPosition] = useState(null);
   const [newMessage, setNewMessage] = useState('');
-  useEffect(() => {
-    localStorage.setItem('positions', JSON.stringify(positions));
-    localStorage.setItem('messages', JSON.stringify(messages));
-  }, [positions, messages]);
   function MapEvents() {
     useMapEvents({
       click(e) {
@@ -31,7 +42,11 @@ function MapPage() {
     });
     return null;
   }
-  
+  // This part is checking if there is a new position and message
+  // available in the state. If there is, it will add the new
+  // position and message to the existing state and reset the
+  // new position and message to null and an empty string
+  // respectively.
   if (newPosition) {
     setPositions([...positions, newPosition]);
     setMessages([...messages, newMessage]);
