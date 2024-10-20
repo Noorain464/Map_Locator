@@ -4,8 +4,8 @@ import { Popup } from 'react-leaflet'
 import customIcon from './Icon';
 import 'leaflet/dist/leaflet.css'
 import '../src/index.css'
-import { useState } from 'react';
-
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 function MapPage() {
   const [positions, setPositions] = useState(() => {
     const storedPositions = localStorage.getItem('positions');
@@ -28,8 +28,14 @@ function MapPage() {
       return [];
     }
   });
+  const [address, setAddress] = useState('');
   const [newPosition, setNewPosition] = useState(null);
   const [newMessage, setNewMessage] = useState('');
+  useEffect(() => {
+    localStorage.setItem('positions', JSON.stringify(positions));
+    localStorage.setItem('messages', JSON.stringify(messages));
+  }, [positions, messages]);
+
   function MapEvents() {
     useMapEvents({
       click(e) {
