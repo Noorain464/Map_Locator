@@ -5,33 +5,61 @@ import customIcon from './Icon';
 import 'leaflet/dist/leaflet.css'
 import '../src/index.css'
 import { useState } from 'react';
+
 function MapPage() {
-  const [position,setPosition] = useState([51.505, -0.09]);
+  const [positions, setPositions] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [newPosition, setNewPosition] = useState(null);
+  const [newMessage, setNewMessage] = useState('');
   function MapEvents() {
     useMapEvents({
       click(e) {
-        console.log(e.latlng);
-        setPosition(e.latlng);
+        const popupInput = prompt('Enter a message');
+        if(popupInput !== null){
+          setNewPosition(e.latlng);
+          setNewMessage(popupInput);
+        }
       },
     });
     return null;
   }
+  // This part is checking if there is a new position and message
+  // available in the state. If there is, it will add the new
+  // position and message to the existing state and reset the
+  // new position and message to null and an empty string
+  // respectively.
+  if (newPosition) {
+    setPositions([...positions, newPosition]);
+    setMessages([...messages, newMessage]);
+    setNewPosition(null);
+    setNewMessage('');
+  }
   return (
-    <div>
+    <div className='map' style={{display: 'flex', height: '100%', width: '100%'}}>
       <MapContainer center={[51.505, -0.09]} zoom={13} scrollWheelZoom={false}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <Marker position={position} icon={customIcon}>
-          <Popup>
-            A pretty CSS3 popup. <br /> Easily customizable.
-          </Popup>
-        </Marker>
+        {positions.map((position, index) => (
+          <Marker key={index} position={position} icon={customIcon}>
+            <Popup>
+              {messages[index]}
+            </Popup>
+          </Marker>
+        ))}
         <MapEvents />
       </MapContainer>
+      <div className='sidebar'style={{height: '100%',width: '30%',}}>
+        <h2 style={{textAlign: 'center',fontFamily: 'sans-serif'}}>Saved Pins</h2>
+        {positions.map((position, index) => (
+          <div key={index} style={{border: '1px solid black', padding: '10px', margin: '10px'}}>
+            <p>{`Latitude: ${positions[index].lat}, Longitude: ${positions[index].lng}`}</p>
+            <p>{`Message: ${messages[index]}`}</p>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
-
 export default MapPage
