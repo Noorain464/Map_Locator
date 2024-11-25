@@ -19,6 +19,16 @@ function MapPage() {
       return 'Unknown Place'
     }
   }
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewPhoto(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
   
   const [map, setMap] = useState(null)
   const [positions, setPositions] = useState(() => {
@@ -96,13 +106,13 @@ function MapPage() {
           <input
             type="file"
             accept="image/*"
-            onChange={e => setNewPhoto(e.target.files[0])}
+            onChange={handleImageChange}
           />
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <button
               onClick={() => {
                 setPositions([...positions, newPosition])
-                setDescriptions([...descriptions, { title: newTitle, message: newMessage, photo: newPhoto ? URL.createObjectURL(newPhoto) : null }])
+                setDescriptions([...descriptions, { title: newTitle, message: newMessage, photo: newPhoto || null }])
                 setNewPosition(null)
               }}
               className='save'
@@ -168,4 +178,5 @@ function MapPage() {
 }
 
 export default MapPage
+
 
