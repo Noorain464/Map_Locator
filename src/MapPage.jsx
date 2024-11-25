@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, useMapEvents } from 'react-leaflet'
+import { MapContainer, TileLayer, useMapEvents,useMap } from 'react-leaflet'
 import { Marker } from 'react-leaflet'
 import customIcon from './Icon'
 import 'leaflet/dist/leaflet.css'
@@ -7,6 +7,20 @@ import { useEffect, useState } from 'react'
 import './style.css'
 
 function MapPage() {
+  const fetchPlaceName = async (lat, lng) => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+      )
+      const data = await response.json()
+      return data.display_name || 'Unknown Place'
+    } catch (error) {
+      console.error('Error fetching place name:', error)
+      return 'Unknown Place'
+    }
+  }
+  
+  const [map, setMap] = useState(null)
   const [positions, setPositions] = useState(() => {
     const storedPositions = localStorage.getItem('positions')
 
@@ -44,10 +58,15 @@ function MapPage() {
   }, [positions, descriptions])
 
   function MapEvents() {
+    const map = useMap()
+    useEffect(() => {
+      setMap(map)
+    })
     useMapEvents({
-      click(e) {
+      click: async(e) => {
         const { lat, lng } = e.latlng
-        setNewPosition({ lat, lng })
+        const placeName = await fetchPlaceName(lat, lng)
+        setNewPosition({ lat, lng ,address:placeName})
         setNewMessage('')
         setNewTitle('')
         setNewPhoto(null)
@@ -120,14 +139,16 @@ function MapPage() {
             <p>No pins saved yet.</p>
           ) : (
             positions.map((position, index) => (
-              <div key={index}>
+              <div key={index} onClick={() => map.flyTo(position, 15)}>
+                <p>{position.address || 'Unnamed Place'}</p>
                 <p>{descriptions[index]?.title || 'Untitled'}</p>
                 <p>{descriptions[index]?.message || 'No description'}</p>
                 {descriptions[index]?.photo && (
                   <img src={descriptions[index].photo} alt="Uploaded" />
                 )}
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation()
                     const newPositions = positions.filter((pos, i) => i !== index)
                     setPositions(newPositions)
                     const newDescriptions = descriptions.filter((desc, i) => i !== index)
