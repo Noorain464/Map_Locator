@@ -119,7 +119,7 @@ function MapPage() {
   return (
     <div>
       <header style={{ textAlign: 'center', marginBottom: '20px' }}>
-        <h1>Map Locator</h1>
+        <h1>PinPost</h1>
         <p>Click on the map to save your favorite spots and add a message!</p>
       </header>
       <div className="map" style={{ display: 'flex', height: '100%', width: '100%' }}>
